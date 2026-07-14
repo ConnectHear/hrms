@@ -4,6 +4,7 @@
 		<Toasts />
 
 		<InstallPrompt />
+		<HubHelp />
 	</ion-app>
 </template>
 
@@ -14,6 +15,7 @@ import { IonApp, IonRouterOutlet } from "@ionic/vue"
 import { Toasts } from "frappe-ui"
 
 import InstallPrompt from "@/components/InstallPrompt.vue"
+import HubHelp from "@/components/HubHelp.vue"
 import { showNotification } from "@/utils/pushNotifications"
 
 onMounted(() => {

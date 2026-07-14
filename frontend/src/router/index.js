@@ -45,6 +45,32 @@ const routes = [
 				name: "SalarySlipsDashboard",
 				component: () => import("@/views/salary_slip/Dashboard.vue"),
 			},
+			{
+				path: "/dashboard/tasks",
+				name: "TasksDashboard",
+				component: () => import("@/views/Tasks.vue"),
+			},
+			{
+				path: "/dashboard/tasks/new",
+				name: "NewTask",
+				component: () => import("@/views/NewTask.vue"),
+			},
+			{
+				// Single merged view — mode determined by presence of :taskName param.
+				path: "/dashboard/tasks/new/assignees",
+				name: "PickAssignees",
+				component: () => import("@/views/AssigneePicker.vue"),
+			},
+			{
+				path: "/dashboard/tasks/:taskName/assignees",
+				name: "EditAssignees",
+				component: () => import("@/views/AssigneePicker.vue"),
+			},
+			{
+				path: "/dashboard/tasks/:taskName",
+				name: "TaskDetail",
+				component: () => import("@/views/TaskDetail.vue"),
+			},
 		],
 	},
 	{

@@ -25,6 +25,9 @@ def get_boot():
 		{
 			"site_name": frappe.local.site,
 			"push_relay_server_url": frappe.conf.get("push_relay_server_url") or "",
+			# ConnectHear DIY Web Push — frontend reads this to decide whether
+			# the Push toggle is gated. See hr_automations.web_push.
+			"vapid_public_key": frappe.conf.get("vapid_public_key") or "",
 			"default_route": get_default_route(),
 		}
 	)

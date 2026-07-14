@@ -1,16 +1,26 @@
 <template>
 	<ion-page>
 		<ion-content :fullscreen="true">
+			<!-- CUSTOM: "Filed for review" banner for non-Finance users.
+			     Without this, the form shows docstatus=0 and looks "unsent" —
+			     employees panic and try Submit which errors. -->
+			<div v-if="filedBannerMessage" class="bg-green-50 border border-green-200 rounded p-3 m-4 mb-0">
+				<p class="text-green-800 text-sm">
+					✅ {{ filedBannerMessage }}
+				</p>
+			</div>
+			<!-- END CUSTOM -->
+
 			<FormView
 				v-if="formFields.data"
 				doctype="Expense Claim"
 				v-model="expenseClaim"
-				:isSubmittable="true"
+				:isSubmittable="canSubmit"
 				:fields="formFields.data"
 				:id="props.id"
 				:tabbedView="true"
 				:tabs="tabs"
-				:showAttachmentView="true"
+				:showAttachmentView="false"
 				@validateForm="validateForm"
 				:showDownloadPDFButton="true"
 			>
@@ -26,25 +36,6 @@
 					/>
 				</template>
 
-				<template #taxes="{ isFormReadOnly }">
-					<ExpenseTaxesTable
-						v-model:expenseClaim="expenseClaim"
-						:currency="currency"
-						:isReadOnly="isReadOnly || isFormReadOnly"
-						@addExpenseTax="addExpenseTax"
-						@updateExpenseTax="updateExpenseTax"
-						@deleteExpenseTax="deleteExpenseTax"
-					/>
-				</template>
-
-				<template #advances="{ isFormReadOnly }">
-					<ExpenseAdvancesTable
-						v-model:expenseClaim="expenseClaim"
-						:currency="currency"
-						:isReadOnly="isReadOnly || isFormReadOnly"
-					/>
-			
-				</template>
 			</FormView>
 		</ion-content>
 	</ion-page>
@@ -64,6 +55,7 @@ import { getCompanyCurrency } from "@/data/currencies"
 
 
 const dayjs = inject("$dayjs")
+const __ = inject("$translate")
 
 const today = dayjs().format("YYYY-MM-DD")
 const isReadOnly = ref(false)
@@ -71,6 +63,25 @@ const isReadOnly = ref(false)
 const sessionEmployee = inject("$employee")
 const currEmployee = ref(sessionEmployee.data.name)
 const employeeCompany = ref(sessionEmployee.data.company)
+const userResource = inject("$user")
+
+// CUSTOM: Only Finance users (Accounts Manager / Accounts User) can submit
+// expense claims — others' Submit clicks just trigger the "Approval Status
+// must be Approved" error and confuse them. Hide the button and show a
+// clear "filed for review" banner instead.
+const isFinance = computed(() => {
+	const roles = userResource?.data?.roles || []
+	return roles.includes("Accounts Manager") || roles.includes("Accounts User")
+})
+
+const canSubmit = computed(() => isFinance.value)
+
+const filedBannerMessage = computed(() => {
+	if (!props.id) return null
+	if (expenseClaim.value.docstatus !== 0) return null
+	if (isFinance.value) return null
+	return __("Filed for Finance review. No further action needed from you — Finance will approve and submit on your behalf.")
+})
 
 
 const props = defineProps({
@@ -81,15 +92,14 @@ const props = defineProps({
 })
 
 const tabs = [
-	{ name: "Expenses", lastField: "taxes" },
-	{ name: "Advances", lastField: "advances" },
-	{ name: "Totals", lastField: "cost_center" },
+	{ name: "Expenses", lastField: "taxes" }
 ]
 
 // object to store form data
 const expenseClaim = ref({
 	employee: currEmployee,
 	company: employeeCompany,
+	posting_date: today
 })
 
 const currency = computed(() => getCompanyCurrency(expenseClaim.value.company))

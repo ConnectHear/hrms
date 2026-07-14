@@ -40,6 +40,19 @@
 								{{ pushNotificationState ? __("Disabling Push Notifications...") : __("Enabling Push Notifications...") }}
 							</span>
 						</div>
+						<!-- Test push button — visible only when notifications are on -->
+						<div
+							v-if="pushNotificationState && !isLoading"
+							class="flex flex-col bg-white rounded p-2"
+						>
+							<Button
+								variant="subtle"
+								:loading="isSendingTest"
+								@click="onSendTest"
+							>
+								{{ __("Send test push to this device") }}
+							</Button>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -54,32 +67,56 @@ import { FeatherIcon, Switch, toast, LoadingIndicator } from "frappe-ui"
 
 import { computed, inject, ref } from "vue"
 
-import { arePushNotificationsEnabled } from "@/data/notifications"
-
 const __ = inject("$translate")
 const router = useRouter()
 const pushNotificationState = ref(
 	window.frappePushNotification?.isNotificationEnabled()
 )
 const isLoading = ref(false)
+const isSendingTest = ref(false)
 
-const disablePushSetting = computed(() => {
-	return (
-		!(
-			window.frappe?.boot.push_relay_server_url &&
-			arePushNotificationsEnabled.data
-		) || isLoading.value
-	)
-})
+// Site is push-capable when the VAPID public key is exposed via boot
+// (injected by hr_automations.web_push.boot.extend_bootinfo).
+const isSiteEnabled = computed(() => Boolean(window.frappe?.boot?.vapid_public_key))
+
+const disablePushSetting = computed(() => !isSiteEnabled.value || isLoading.value)
 
 const description = computed(() => {
-	return !(
-		window.frappe?.boot.push_relay_server_url &&
-		arePushNotificationsEnabled.data
-	)
-		? __("Push notifications have been disabled on your site")
-		: ""
+	if (!isSiteEnabled.value) {
+		return __("Push notifications have not been configured on this site")
+	}
+	if (typeof Notification !== "undefined" && Notification.permission === "denied") {
+		return __("Notifications are blocked in your browser settings. Enable them and reload.")
+	}
+	return ""
 })
+
+const onSendTest = async () => {
+	isSendingTest.value = true
+	try {
+		const res = await window.frappePushNotification.sendTestPush()
+		const sent = res?.sent ?? 0
+		toast({
+			title: sent > 0 ? __("Test push sent") : __("No active subscription"),
+			text: sent > 0
+				? __("Check your notification tray in a few seconds.")
+				: __("Toggle Push off and on, then try again."),
+			icon: sent > 0 ? "check-circle" : "alert-circle",
+			position: "bottom-center",
+			iconClasses: sent > 0 ? "text-green-500" : "text-red-500",
+		})
+	} catch (e) {
+		toast({
+			title: __("Error"),
+			text: e.message || String(e),
+			icon: "alert-circle",
+			position: "bottom-center",
+			iconClasses: "text-red-500",
+		})
+	} finally {
+		isSendingTest.value = false
+	}
+}
 
 const togglePushNotifications = (newValue) => {
 	if (newValue) {

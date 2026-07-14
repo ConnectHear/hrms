@@ -26,19 +26,7 @@
    "width": "Full"
   },
   {
-   "chart": "Gender Diversity Ratio",
-   "width": "Half"
-  },
-  {
    "chart": "Employees by Type",
-   "width": "Half"
-  },
-  {
-   "chart": "Employees by Grade",
-   "width": "Half"
-  },
-  {
-   "chart": "Employees by Branch",
    "width": "Half"
   },
   {
@@ -57,7 +45,7 @@
  "idx": 0,
  "is_default": 0,
  "is_standard": 1,
- "modified": "2024-01-08 14:06:32.104261",
+ "modified": "2026-02-26 16:44:53.647527",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Human Resource",

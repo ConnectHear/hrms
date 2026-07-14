@@ -140,9 +140,18 @@ def get_attendance_for_calendar(employee: str, from_date: str, to_date: str) -> 
 	attendance = frappe.get_all(
 		"Attendance",
 		{"employee": employee, "attendance_date": ["between", [from_date, to_date]], "docstatus": 1},
-		["attendance_date", "status"],
+		["attendance_date", "status", "late_entry"],
 	)
-	return {d["attendance_date"]: d["status"] for d in attendance}
+	# ConnectHear: surface a late check-in as its own "Late" event so the PWA
+	# calendar can colour it distinctly (a late Present day otherwise looks
+	# identical to an on-time one). Only worked days can be "late".
+	result = {}
+	for d in attendance:
+		status = d["status"]
+		if d.get("late_entry") and status in ("Present", "Work From Home"):
+			status = "Late"
+		result[d["attendance_date"]] = status
+	return result
 
 
 def get_holidays_for_calendar(employee: str, from_date: str, to_date: str) -> list[str]:

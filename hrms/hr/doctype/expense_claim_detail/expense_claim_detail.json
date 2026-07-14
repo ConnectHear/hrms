@@ -6,9 +6,15 @@
  "engine": "InnoDB",
  "field_order": [
   "expense_date",
+  "travel_mode",
+  "distance_km",
+  "travel_proof",
+  "btn_view_receipt",
   "column_break_2",
   "expense_type",
   "default_account",
+  "travel_from",
+  "travel_to",
   "description_sb",
   "description",
   "amounts_sb",
@@ -58,6 +64,7 @@
    "read_only": 1
   },
   {
+   "description": "Name of person travelled with and other details (if applicable)",
    "fetch_from": "expense_type.description",
    "fetch_if_empty": 1,
    "fieldname": "description",
@@ -88,6 +95,7 @@
   {
    "fieldname": "sanctioned_amount",
    "fieldtype": "Currency",
+   "hidden": 1,
    "in_list_view": 1,
    "label": "Sanctioned Amount",
    "oldfieldname": "sanctioned_amount",
@@ -126,17 +134,58 @@
   {
    "fieldname": "amounts_sb",
    "fieldtype": "Section Break"
+  },
+  {
+   "depends_on": "eval:doc.expense_type == 'Transport / Conveyance'",
+   "fieldname": "travel_mode",
+   "fieldtype": "Select",
+   "label": "Mode of Travel",
+   "options": "Ride hailing (Careem, Yango, inDrive)\nPersonal vehicle - Bike\nPersonal vehicle - Car\nPublic Transport"
+  },
+  {
+   "depends_on": "eval:doc.expense_type == 'Transport / Conveyance'",
+   "fieldname": "distance_km",
+   "fieldtype": "Float",
+   "label": "Distance (KM)"
+  },
+  {
+   "depends_on": "eval:doc.expense_type == 'Transport / Conveyance'",
+   "fieldname": "travel_proof",
+   "fieldtype": "Attach",
+   "hidden": 1,
+   "in_list_view": 1,
+   "label": "Travel Proof"
+  },
+  {
+   "depends_on": "eval:doc.expense_type == 'Transport / Conveyance'",
+   "fieldname": "travel_from",
+   "fieldtype": "Data",
+   "label": "Travel From"
+  },
+  {
+   "depends_on": "eval:doc.expense_type == 'Transport / Conveyance'",
+   "fieldname": "travel_to",
+   "fieldtype": "Data",
+   "label": "Travel To"
+  },
+  {
+   "fieldname": "btn_view_receipt",
+   "fieldtype": "Button",
+   "in_list_view": 1,
+   "label": "View Receipt",
+   "read_only": 1
   }
  ],
  "idx": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-10-10 14:58:36.316268",
+ "modified": "2025-12-16 15:15:39.874260",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Expense Claim Detail",
  "owner": "Administrator",
  "permissions": [],
+ "row_format": "Dynamic",
  "sort_field": "creation",
  "sort_order": "DESC",
  "states": []

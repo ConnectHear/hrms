@@ -147,7 +147,8 @@ import { formatCurrency } from "@/utils/formatters"
 
 import ProfileInfoModal from "@/components/ProfileInfoModal.vue"
 
-import { arePushNotificationsEnabled } from "@/data/notifications"
+// arePushNotificationsEnabled import removed — replaced by VAPID-key
+// presence check; see allowPushNotifications computed below.
 
 const DOCTYPE = "Employee"
 
@@ -216,10 +217,11 @@ const profileLinks = [
 const isInfoModalOpen = ref(false)
 const selectedItem = ref(null)
 
+// Settings link is shown when the site has a VAPID public key configured.
+// (ConnectHear uses a native Web Push + VAPID flow instead of the Frappe
+// Cloud relay this view originally checked for.)
 const allowPushNotifications = computed(
-	() =>
-		window.frappe?.boot.push_relay_server_url &&
-		arePushNotificationsEnabled.data
+	() => Boolean(window.frappe?.boot?.vapid_public_key)
 )
 
 const openInfoModal = async (request) => {

@@ -1,0 +1,155 @@
+{
+ "app": "hrms",
+ "charts": [],
+ "content": "[{\"id\":\"8yWpMJHqll\",\"type\":\"paragraph\",\"data\":{\"text\":\"My Dashboards\",\"col\":12}},{\"id\":\"1vEWgln6jI\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Attendance\",\"col\":3}},{\"id\":\"FZ_iCjXoUU\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Recruitment\",\"col\":3}},{\"id\":\"1jpSjYdcDP\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Tasks\",\"col\":3}},{\"id\":\"59ovOqCc0X\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Employee Lifecycle\",\"col\":3}},{\"id\":\"Q1NzADTVSX\",\"type\":\"paragraph\",\"data\":{\"text\":\"Shortcuts\",\"col\":12}},{\"id\":\"Sx4o0LxgPT\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Missing Checkins\",\"col\":4}},{\"id\":\"SShgQBhiF0\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Absent, On Leave, and WFH\",\"col\":4}},{\"id\":\"sZbB2cFVzr\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Employees on Leave Today\",\"col\":4}},{\"id\":\"SI2r1y0Ch5\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Pending Leaves Applications (This Week)\",\"col\":4}},{\"id\":\"jI3YpN8wAu\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Attendance Correction\",\"col\":5}},{\"id\":\"bdRZHeMOkr\",\"type\":\"paragraph\",\"data\":{\"text\":\"Recruitment &amp; Performance\",\"col\":12}},{\"id\":\"Z20C6amja3\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Vacancies\",\"col\":3}},{\"id\":\"xdiGesezLJ\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"KRA\",\"col\":3}},{\"id\":\"JOULdDfUwS\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Appraisal Cycle\",\"col\":3}},{\"id\":\"XC0ByZQZkk\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Candidates\",\"col\":3}},{\"id\":\"jhh-bYrnLA\",\"type\":\"paragraph\",\"data\":{\"text\":\"Tasks &amp; Attendance\",\"col\":12}},{\"id\":\"rDn0bvSdjJ\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Tasks Due Today\",\"col\":4}},{\"id\":\"_CCOYpB8-W\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Task\",\"col\":4}},{\"id\":\"epVoqwBBUL\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Present Today\",\"col\":4}},{\"id\":\"UyOUMr6vZe\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Leaves</span>\",\"col\":12}},{\"id\":\"ZbNI53eOuY\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Pending Leaves Quicklist\",\"col\":4}}]",
+ "creation": "2025-12-22 12:14:56.267979",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "view",
+ "idx": 14,
+ "indicator_color": "cyan",
+ "is_hidden": 0,
+ "label": "Hub HQ",
+ "link_type": "DocType",
+ "links": [],
+ "modified": "2026-06-08 23:17:33.316587",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "Hub HQ",
+ "number_cards": [
+  {
+   "label": "Pending Leaves Applications (This Week)",
+   "number_card_name": "Pending Leave Applications (This Week)"
+  },
+  {
+   "label": "Employees on Leave Today",
+   "number_card_name": "Employees on Leave Today"
+  }
+ ],
+ "owner": "Administrator",
+ "parent_page": "",
+ "public": 1,
+ "quick_lists": [
+  {
+   "document_type": "Task",
+   "label": "Tasks Due Today",
+   "quick_list_filter": "[[\"Task\",\"exp_end_date\",\"Timespan\",\"today\",false]]"
+  },
+  {
+   "document_type": "Leave Application",
+   "label": "Pending Leaves Quicklist",
+   "quick_list_filter": "[[\"Leave Application\",\"docstatus\",\"=\",\"0\",false],[\"Leave Application\",\"status\",\"=\",\"Open\",false]]"
+  },
+  {
+   "document_type": "Task",
+   "label": "Task",
+   "quick_list_filter": "[]"
+  },
+  {
+   "document_type": "Employee Checkin",
+   "label": "Present Today",
+   "quick_list_filter": "[[\"Employee Checkin\",\"creation\",\"Timespan\",\"today\",false]]"
+  }
+ ],
+ "roles": [],
+ "sequence_id": 35.0,
+ "shortcuts": [
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Recruitment",
+   "link_to": "Recruitment",
+   "type": "Dashboard"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Vacancies",
+   "link_to": "Job Opening",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Employee Lifecycle",
+   "link_to": "Employee Lifecycle",
+   "type": "Dashboard"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Missing Checkins",
+   "link_to": "Missing Checkins Today",
+   "report_ref_doctype": "Employee",
+   "type": "Report"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Absent, On Leave, and WFH",
+   "link_to": "Absent, On Leave, WFH",
+   "report_ref_doctype": "Attendance",
+   "type": "Report"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "KRA",
+   "link_to": "KRA",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Attendance Correction",
+   "link_to": "Attendance Request",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Tasks",
+   "link_to": "Tasks",
+   "type": "Dashboard"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Attendance",
+   "link_to": "Attendance",
+   "type": "Dashboard"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Appraisal Cycle",
+   "link_to": "Appraisal Cycle",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Green",
+   "doc_view": "List",
+   "label": "Candidates",
+   "link_to": "Job Applicant",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Blue",
+   "doc_view": "",
+   "icon": "calendar",
+   "label": "Bookings",
+   "link_to": "Booking",
+   "type": "DocType"
+  }
+ ],
+ "title": "Hub HQ",
+ "type": "Workspace"
+}

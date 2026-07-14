@@ -35,10 +35,6 @@
    "width": "Half"
   },
   {
-   "chart": "Job Applicants by Country",
-   "width": "Half"
-  },
-  {
    "chart": "Job Application Status",
    "width": "Half"
   },
@@ -70,7 +66,7 @@
  "idx": 0,
  "is_default": 0,
  "is_standard": 1,
- "modified": "2022-08-29 23:28:26.765572",
+ "modified": "2026-02-26 16:52:13.936592",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Recruitment",

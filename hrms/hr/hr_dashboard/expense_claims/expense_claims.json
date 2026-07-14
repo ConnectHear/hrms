@@ -17,11 +17,7 @@
   },
   {
    "chart": "Claims by Type",
-   "width": "Half"
-  },
-  {
-   "chart": "Employee Advance Status",
-   "width": "Half"
+   "width": "Full"
   },
   {
    "chart": "Department wise Expense Claims",
@@ -35,7 +31,7 @@
  "idx": 0,
  "is_default": 0,
  "is_standard": 1,
- "modified": "2022-09-16 11:36:44.704033",
+ "modified": "2026-01-09 16:24:33.858115",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Expense Claims",

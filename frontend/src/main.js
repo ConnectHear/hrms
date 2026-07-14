@@ -59,38 +59,32 @@ app.provide("$socket", socket)
 app.provide("$dayjs", dayjs)
 
 const registerServiceWorker = async () => {
-	window.frappePushNotification = new FrappePushNotification("hrms")
+    if (!("serviceWorker" in navigator)) {
+        console.warn("Service worker not supported by this browser")
+        return
+    }
+    const serviceWorkerURL = "/assets/hrms/frontend/sw.js"
+    try {
+        const registration = await navigator.serviceWorker.register(serviceWorkerURL, { type: "classic" })
+        const vapidKey = window.frappe?.boot?.vapid_public_key || ""
+        window.frappePushNotification = new FrappePushNotification()
+        await window.frappePushNotification.init(registration, vapidKey)
+        console.log("Frappe Push Notification initialized")
 
-	if ("serviceWorker" in navigator) {
-		let serviceWorkerURL = "/assets/hrms/frontend/sw.js"
-		let config = ""
-
-		try {
-			config = await window.frappePushNotification.fetchWebConfig()
-			serviceWorkerURL = `${serviceWorkerURL}?config=${encodeURIComponent(
-				JSON.stringify(config)
-			)}`
-		} catch (err) {
-			console.error("Failed to fetch FCM config", err)
-		}
-
-		navigator.serviceWorker
-			.register(serviceWorkerURL, {
-				type: "classic",
-			})
-			.then((registration) => {
-				if (config) {
-					window.frappePushNotification.initialize(registration).then(() => {
-						console.log("Frappe Push Notification initialized")
-					})
-				}
-			})
-			.catch((err) => {
-				console.error("Failed to register service worker", err)
-			})
-	} else {
-		console.error("Service worker not enabled/supported by the browser")
-	}
+        // Deep-link from a tapped push notification. The SW posts
+        // { type: "push-navigate", url: "/hrms/dashboard/tasks/..." }
+        // when the user taps a notification and the PWA is already
+        // open — handle that by routing inside the SPA so we don't
+        // do a full page reload.
+        navigator.serviceWorker.addEventListener("message", (event) => {
+            if (event.data?.type !== "push-navigate" || !event.data.url) return
+            // Router base is "/hrms" — strip that prefix to get the SPA path.
+            const path = String(event.data.url).replace(/^\/hrms/, "") || "/home"
+            router.push(path).catch(() => {})
+        })
+    } catch (err) {
+        console.error("Failed to register service worker / push:", err)
+    }
 }
 
 router.isReady().then(async () => {

@@ -44,7 +44,7 @@
 			<hr />
 
 			<!-- Summary -->
-			<div class="grid grid-cols-4 mx-2">
+			<div class="grid grid-cols-5 mx-2">
 				<div v-for="status in summaryStatuses" class="flex flex-col gap-1">
 					<div class="flex flex-row gap-1 items-center">
 						<span class="rounded full h-3 w-3" :class="colorMap[status]" />
@@ -71,14 +71,15 @@ const firstOfMonth = ref(dayjs().date(1).startOf("D"))
 const colorMap = {
 	Present: "bg-green-300",
 	"Work From Home": "bg-green-300",
+	Late: "bg-orange-400",
 	"Half Day": "bg-yellow-200",
 	Absent: "bg-red-200",
 	"On Leave": "bg-blue-300",
 	Holiday: "bg-gray-300",
 }
 
-// __("Present"), __("Half Day"), __("Absent"), __("On Leave"), __("Work From Home")
-const summaryStatuses = ["Present", "Half Day", "Absent", "On Leave"]
+// __("Present"), __("Late"), __("Half Day"), __("Absent"), __("On Leave"), __("Work From Home")
+const summaryStatuses = ["Present", "Late", "Half Day", "Absent", "On Leave"]
 
 const summary = computed(() => {
 	const summary = {}

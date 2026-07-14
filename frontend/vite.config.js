@@ -23,11 +23,12 @@ export default defineConfig({
 			},
 			manifest: {
 				display: "standalone",
-				name: "Frappe HR",
-				short_name: "Frappe HR",
+				name: "ConnectHear Hub",
+				short_name: "CH Hub",
 				start_url: "/hrms",
-				description: "Everyday HR & Payroll operations at your fingertips",
-				theme_color: "#ffffff",
+				description: "ConnectHear's everyday HR, payroll and booking operations.",
+				theme_color: "#47C1C8",
+				background_color: "#47C1C8",
 				icons: [
 					{
 						src: "/assets/hrms/manifest/manifest-icon-192.maskable.png",

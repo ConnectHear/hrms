@@ -15,7 +15,15 @@
 					: 'text-gray-600 font-normal',
 			]"
 		>
-			<component :is="item.icon" class="h-5 w-5" />
+			<span class="relative inline-block">
+				<component :is="item.icon" class="h-5 w-5" />
+				<span
+					v-if="item.badge && item.badge.value > 0"
+					class="absolute -top-1.5 -right-2 bg-red-500 text-white rounded-full text-[9px] font-bold leading-none px-1 min-w-[14px] h-[14px] flex items-center justify-center border border-white"
+				>
+					{{ item.badge.value > 99 ? "99+" : item.badge.value }}
+				</span>
+			</span>
 			<div>{{ item.title }}</div>
 		</ion-tab-button>
 	</ion-tab-bar>
@@ -31,6 +39,7 @@ import LeaveIcon from "@/components/icons/LeaveIcon.vue"
 import ExpenseIcon from "@/components/icons/ExpenseIcon.vue"
 import SalaryIcon from "@/components/icons/SalaryIcon.vue"
 import AttendanceIcon from "@/components/icons/AttendanceIcon.vue"
+import TasksIcon from "@/components/icons/TasksIcon.vue"
 import { inject } from "vue"
 
 const __ = inject("$translate")
@@ -42,6 +51,11 @@ const tabItems = [
 		icon: HomeIcon,
 		title: __("Home"),
 		route: "/home",
+	},
+	{
+		icon: TasksIcon,
+		title: __("Tasks"),
+		route: "/dashboard/tasks",
 	},
 	{
 		icon: AttendanceIcon,

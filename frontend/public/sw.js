@@ -59,6 +59,50 @@ try {
 	console.log("Failed to initialize Firebase", error)
 }
 
+// ────────────────────────────────────────────────────────────────────
+// ConnectHear Web Push (native VAPID) — added 2026-06-05
+// Independent of the Firebase block above (which is dead code in our
+// non-FC setup). Payload shape comes from
+// hr_automations.web_push.sender.send_notification_log_push.
+// ────────────────────────────────────────────────────────────────────
+self.addEventListener("push", (event) => {
+	if (!event.data) return
+	let data
+	try {
+		data = event.data.json()
+	} catch (e) {
+		data = { title: "Hub", body: event.data.text() }
+	}
+	const title = data.title || "Hub"
+	const opts = {
+		body: data.body || "",
+		icon: "/assets/hrms/manifest/manifest-icon-192.maskable.png",
+		badge: "/assets/hrms/manifest/manifest-icon-192.maskable.png",
+		tag: data.tag,
+		data: { url: data.url || "/hrms" },
+	}
+	event.waitUntil(self.registration.showNotification(title, opts))
+})
+
+self.addEventListener("notificationclick", (event) => {
+	event.notification.close()
+	const url = event.notification.data && event.notification.data.url
+	if (!url) return
+	event.waitUntil((async () => {
+		const all = await self.clients.matchAll({ type: "window", includeUncontrolled: true })
+		// If the PWA is already open, postMessage it the deep link and
+		// let the Vue router navigate — client.navigate() silently fails
+		// across the SW's scope boundary on installed PWAs.
+		for (const c of all) {
+			if (c.url.includes("/hrms") && "focus" in c) {
+				try { c.postMessage({ type: "push-navigate", url }) } catch (e) {}
+				return c.focus()
+			}
+		}
+		return self.clients.openWindow(url)
+	})())
+})
+
 self.skipWaiting()
 clientsClaim()
 console.log("Service Worker Initialized")

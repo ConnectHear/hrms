@@ -58,9 +58,17 @@ const options = createResource({
 	method: "POST",
 	transform: (data) => {
 		return data.map((doc) => {
-			const title = doc?.description?.split(",")?.[0]
+			// Frappe's search_link returns the doctype's title_field value in
+			// the `label` key (separate from `description`). The original code
+			// pulled split[0] of description, which for doctypes with
+			// auto-generated naming series (Project, Expense Claim, etc.)
+			// returns the doc's name — giving us "CODE : CODE" labels. Use the
+			// actual title when it's different from the value (skip if they
+			// match, like Employee where name = full_name display already
+			// handled by show_title_field_in_link).
+			const title = doc?.label && doc.label !== doc.value ? doc.label : null
 			return {
-				label: title ? `${title} : ${doc.value}` : doc.value,
+				label: title ? `${title} (${doc.value})` : doc.value,
 				value: doc.value,
 			}
 		})
