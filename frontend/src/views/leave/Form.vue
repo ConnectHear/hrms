@@ -1,6 +1,20 @@
 <template>
     <ion-page>
         <ion-content :fullscreen="true">
+            <!-- CUSTOM: Hub Help moment-of-need pointer (create only) -->
+            <div
+                v-if="!props.id"
+                class="rounded p-3 m-4 mb-0 cursor-pointer"
+                style="background: #e9f7f8; border: 1px solid #cdeced"
+                @click="askHubHelp('How does casual leave notice work, and how do I apply for leave?')"
+            >
+                <p class="text-sm" style="color: #0f7f86">
+                    💬 Not sure about the leave rules — notice, half-day, or sick-leave proof?
+                    <span class="font-semibold underline">Ask Hub Help →</span>
+                </p>
+            </div>
+            <!-- END CUSTOM -->
+
             <!-- CUSTOM: Insufficient Balance Alert -->
             <div v-if="conversionState.show" class="bg-red-50 border border-red-200 rounded p-4 m-4 mb-0">
                 <div class="flex flex-col gap-2">
@@ -51,6 +65,7 @@ import { createResource, Button } from "frappe-ui" // Added Button import
 import { ref, watch, inject, computed } from "vue"
 
 import FormView from "@/components/FormView.vue"
+import { askHubHelp } from "@/composables/useHubHelp"
 
 const dayjs = inject("$dayjs")
 const __ = inject("$translate")

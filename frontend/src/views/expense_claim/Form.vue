@@ -1,6 +1,20 @@
 <template>
 	<ion-page>
 		<ion-content :fullscreen="true">
+			<!-- CUSTOM: Hub Help moment-of-need pointer (create only) -->
+			<div
+				v-if="!props.id"
+				class="rounded p-3 m-4 mb-0 cursor-pointer"
+				style="background: #e9f7f8; border: 1px solid #cdeced"
+				@click="askHubHelp('What can I claim as an expense, and by when do I have to file it?')"
+			>
+				<p class="text-sm" style="color: #0f7f86">
+					💬 Not sure what you can claim, or about the 30-day limit?
+					<span class="font-semibold underline">Ask Hub Help →</span>
+				</p>
+			</div>
+			<!-- END CUSTOM -->
+
 			<!-- CUSTOM: "Filed for review" banner for non-Finance users.
 			     Without this, the form shows docstatus=0 and looks "unsent" —
 			     employees panic and try Submit which errors. -->
@@ -47,6 +61,7 @@ import { createResource } from "frappe-ui"
 import { computed, ref, watch, inject } from "vue"
 
 import FormView from "@/components/FormView.vue"
+import { askHubHelp } from "@/composables/useHubHelp"
 import ExpensesTable from "@/components/ExpensesTable.vue"
 import ExpenseTaxesTable from "@/components/ExpenseTaxesTable.vue"
 import ExpenseAdvancesTable from "@/components/ExpenseAdvancesTable.vue"

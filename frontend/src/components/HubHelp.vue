@@ -10,13 +10,23 @@
 			<span aria-hidden="true">💬</span>
 		</button>
 
+		<!-- First-run discovery hint: many mobile users never notice the FAB.
+		     Shows for the first few app loads, until they open Hub Help once. -->
+		<div v-if="!open && showHint" class="hubhelp-hint" role="status" aria-live="polite">
+			<button class="hint-x" @click.stop="dismissHint" aria-label="Dismiss">&times;</button>
+			<div class="hint-body" @click="openPanel">👋 New here? <b>Ask me anything</b> about the Hub — leave, expenses, attendance…</div>
+		</div>
+
 		<div v-if="open" class="hubhelp-panel" role="dialog" aria-label="Hub Help">
 			<div class="hubhelp-head">
 				<div>
 					<div class="ttl">Hub Help</div>
 					<div class="sub">Ask how to do things on the Hub</div>
 				</div>
-				<button class="x" @click="open = false" aria-label="Close Hub Help">&times;</button>
+				<div class="head-actions">
+					<a class="guides" href="/hub_help" target="_blank" rel="noopener" aria-label="Browse all guides">📖 Guides</a>
+					<button class="x" @click="open = false" aria-label="Close Hub Help">&times;</button>
+				</div>
 			</div>
 
 			<div ref="logEl" class="hubhelp-log">
@@ -60,8 +70,9 @@
 </template>
 
 <script setup>
-import { ref, computed, nextTick, onMounted } from "vue"
+import { ref, computed, nextTick, onMounted, watch } from "vue"
 import { createResource } from "frappe-ui"
+import { hubHelpRequest } from "@/composables/useHubHelp"
 
 const enabled = ref(false)
 const suggestions = ref([])
@@ -70,6 +81,17 @@ const loading = ref(false)
 const q = ref("")
 const messages = ref([])
 const logEl = ref(null)
+const showHint = ref(false)
+
+// First-run hint state lives in localStorage (per device — fine for a discovery
+// nudge). We stop showing it once the user has opened Hub Help even once.
+const HINT_KEY = "hubhelp_hint_count"
+const OPENED_KEY = "hubhelp_opened"
+const HINT_MAX_SHOWS = 3
+let openedSent = false
+
+function lsGet(k) { try { return window.localStorage.getItem(k) } catch (e) { return null } }
+function lsSet(k, v) { try { window.localStorage.setItem(k, v) } catch (e) { /* private mode */ } }
 
 const GREETING = "Hi! I can help you use the Hub — leave, expenses, attendance and more. What do you need?"
 
@@ -106,6 +128,7 @@ async function scroll() {
 const gate = createResource({ url: "connecthear_ai.help_assistant.is_enabled_for_me" })
 const askRes = createResource({ url: "connecthear_ai.help_assistant.ask" })
 const fbRes = createResource({ url: "connecthear_ai.help_assistant.submit_feedback" })
+const openedRes = createResource({ url: "connecthear_ai.help_assistant.nudge_opened_help" })
 
 onMounted(async () => {
 	try {
@@ -114,6 +137,32 @@ onMounted(async () => {
 		suggestions.value = (r && r.suggestions) || []
 	} catch (e) {
 		enabled.value = false
+	}
+	if (!enabled.value) return
+	// Show the discovery hint for the first few loads, until they've opened it.
+	const opened = lsGet(OPENED_KEY) === "1"
+	const count = parseInt(lsGet(HINT_KEY) || "0", 10) || 0
+	if (!opened && count < HINT_MAX_SHOWS) {
+		showHint.value = true
+		lsSet(HINT_KEY, String(count + 1))
+		setTimeout(() => { showHint.value = false }, 9000)
+	}
+})
+
+function dismissHint() {
+	showHint.value = false
+	lsSet(HINT_KEY, String(HINT_MAX_SHOWS)) // don't show it again on this device
+}
+
+// A form screen (leave / expense / attendance) can open the chat pre-seeded
+// with the relevant question — the moment-of-need pointer. Each askHubHelp()
+// call is a fresh object so this fires even for a repeated question.
+watch(hubHelpRequest, (req) => {
+	if (!req) return
+	openPanel()
+	if (req.question) {
+		q.value = req.question
+		send()
 	}
 })
 
@@ -124,8 +173,20 @@ function sendPill(s) {
 	send()
 }
 
+function markOpened() {
+	showHint.value = false
+	lsSet(OPENED_KEY, "1")
+	// Tell the server they've engaged, so the Desk nudge cadence relaxes too
+	// (cross-surface: engaging on mobile shouldn't keep nagging on Desk).
+	if (!openedSent) {
+		openedSent = true
+		try { openedRes.submit() } catch (e) { /* best-effort */ }
+	}
+}
+
 function openPanel() {
 	open.value = true
+	markOpened()
 	if (!messages.value.length) {
 		messages.value.push({ role: "bot", soft: true, html: toHtml(GREETING) })
 	}
@@ -213,7 +274,37 @@ function feedback(m, helpful) {
 }
 .hubhelp-head .ttl { font-weight: 700; font-size: 16px; }
 .hubhelp-head .sub { font-size: 12px; opacity: 0.9; margin-top: 1px; }
+.hubhelp-head .head-actions { display: flex; align-items: center; gap: 12px; }
+.hubhelp-head .guides { color: #fff; font-size: 13px; text-decoration: none; opacity: 0.95; white-space: nowrap; }
 .hubhelp-head .x { background: none; border: none; color: #fff; font-size: 26px; line-height: 1; padding: 0 4px; }
+.hubhelp-hint {
+	position: fixed;
+	right: 16px;
+	bottom: 146px;
+	z-index: 999;
+	max-width: min(260px, calc(100vw - 32px));
+	background: #fff;
+	color: #1f272e;
+	border: 1px solid #e2e7e6;
+	border-left: 4px solid #2fbfc7;
+	border-radius: 12px;
+	box-shadow: 0 8px 26px rgba(0, 0, 0, 0.2);
+	padding: 11px 26px 11px 13px;
+	font-size: 13px;
+	line-height: 1.45;
+}
+.hubhelp-hint .hint-x {
+	position: absolute;
+	top: 4px;
+	right: 7px;
+	background: none;
+	border: none;
+	font-size: 17px;
+	line-height: 1;
+	color: #8a9694;
+}
+.hubhelp-hint .hint-body { cursor: pointer; }
+.hubhelp-hint b { color: #0f7f86; }
 .hubhelp-log {
 	flex: 1;
 	overflow-y: auto;

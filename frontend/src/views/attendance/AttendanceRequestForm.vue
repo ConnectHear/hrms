@@ -1,6 +1,20 @@
 <template>
 	<ion-page>
 		<ion-content :fullscreen="true">
+			<!-- CUSTOM: Hub Help moment-of-need pointer (create only) -->
+			<div
+				v-if="!props.id"
+				class="rounded p-3 m-4 mb-0 cursor-pointer"
+				style="background: #e9f7f8; border: 1px solid #cdeced"
+				@click="askHubHelp('How do I fix a wrong or missed attendance day?')"
+			>
+				<p class="text-sm" style="color: #0f7f86">
+					💬 Fixing a wrong or missed attendance day?
+					<span class="font-semibold underline">Ask Hub Help →</span>
+				</p>
+			</div>
+			<!-- END CUSTOM -->
+
 			<FormView
 				v-if="formFields.data"
 				doctype="Attendance Request"
@@ -20,6 +34,7 @@ import { createResource, call, toast } from "frappe-ui"
 import { ref, watch, inject } from "vue"
 
 import FormView from "@/components/FormView.vue"
+import { askHubHelp } from "@/composables/useHubHelp"
 
 const employee = inject("$employee")
 const __ = inject("$translate")
