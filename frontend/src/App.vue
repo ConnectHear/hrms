@@ -5,6 +5,7 @@
 
 		<InstallPrompt />
 		<HubHelp />
+		<StillWorkingBanner />
 	</ion-app>
 </template>
 
@@ -16,6 +17,7 @@ import { Toasts } from "frappe-ui"
 
 import InstallPrompt from "@/components/InstallPrompt.vue"
 import HubHelp from "@/components/HubHelp.vue"
+import StillWorkingBanner from "@/components/StillWorkingBanner.vue"
 import { showNotification } from "@/utils/pushNotifications"
 
 onMounted(() => {
