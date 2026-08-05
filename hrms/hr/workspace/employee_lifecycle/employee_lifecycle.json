@@ -290,7 +290,7 @@
    "type": "Link"
   }
  ],
- "modified": "2025-04-19 17:45:02.430487",
+ "modified": "2026-08-05 15:58:32.302682",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Lifecycle",
@@ -315,8 +315,18 @@
    "quick_list_filter": "{\"relieving_date\":[\"Timespan\",\"this month\"]}"
   }
  ],
- "roles": [],
- "sequence_id": 2.0,
+ "roles": [
+  {
+   "role": "HR Manager"
+  },
+  {
+   "role": "HR User"
+  },
+  {
+   "role": "System Manager"
+  }
+ ],
+ "sequence_id": 18.0,
  "shortcuts": [
   {
    "color": "Grey",
