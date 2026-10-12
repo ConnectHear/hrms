@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "i=$(cat); c=$(printf '%s' \"$i\" | jq -r '.tool_input.command // \"\"' 2>/dev/null || printf '%s' \"$i\" | python3 -c 'import json,sys; print(json.load(sys.stdin).get(\"tool_input\",{}).get(\"command\",\"\"))'); if printf '%s' \"$c\" | grep -qE '(^|[;&|(]|[[:space:]])gh[[:space:]]+pr[[:space:]]+create([[:space:]]|$)' && ! printf '%s' \"$c\" | grep -qE '(^|[[:space:]])(--draft|-d)([[:space:]=]|$)'; then printf '%s\\n' '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"Open PRs as drafts: re-run this as gh pr create --draft ..., push freely, and run gh pr ready only when the work is done. Drafts run no CI and GitHub Actions minutes are a hard monthly budget.\"}}'; fi",
+            "statusMessage": "Checking PR is a draft"
+          }
+        ]
+      }
+    ]
+  }
+}
