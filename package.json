@@ -14,6 +14,7 @@
   },
   "aworkspaces": ["frontend", "roster", "frappe-ui"],
   "scripts": {
+    "ci:train": "bash scripts/merge-train",
     "postinstall": "yarn install-pwa-deps && yarn install-roster-deps",
     "install-pwa-deps": "cd frontend && yarn install --check-files",
     "install-roster-deps": "cd roster && yarn install --check-files",
