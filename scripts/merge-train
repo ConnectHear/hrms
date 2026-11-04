@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+# Wrapper for the ConnectHear shared merge train. Copy this file into your repo as
+# scripts/merge-train (or any path) and call it with the train's arguments:
+#
+#   scripts/merge-train                       a batch: every ready PR labelled `train`
+#   scripts/merge-train --dry-run
+#   scripts/merge-train --single-pr 12 --reason "owner asked"
+#   scripts/merge-train --go "arhum: ship the fix"        live branches (needs_go in train.json)
+#
+# It fetches tools/merge-train.sh from ConnectHear/.github at the tag below, checks its sha256
+# against .github/train.sha256 in this repo, caches it under the git common dir, and runs it.
+# A mismatch, a missing .github/train.sha256 or a failed fetch stops here: it never runs a script
+# it could not verify. A change on the .github default branch cannot alter a train that runs
+# here; moving to a new train version is a PR that changes TRAIN_TAG and .github/train.sha256.
+#
+# Needs: gh (logged in), git, jq, and shasum or sha256sum.
+set -euo pipefail
+
+TRAIN_TAG=train-v1
+TRAIN_SOURCE_REPO=ConnectHear/.github
+TRAIN_SOURCE_PATH=tools/merge-train.sh
+GH=${TRAIN_GH:-gh}
+
+die() { printf '[train-wrapper] %s\n' "$*" >&2; exit 1; }
+
+sha256_of() {
+  if command -v sha256sum >/dev/null 2>&1; then sha256sum "$1" | cut -d' ' -f1
+  elif command -v shasum >/dev/null 2>&1; then shasum -a 256 "$1" | cut -d' ' -f1
+  else die "need sha256sum or shasum to verify the train script"; fi
+}
+
+ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || die "run this inside the repo"
+PIN_FILE="$ROOT/.github/train.sha256"
+[ -f "$PIN_FILE" ] || die "missing .github/train.sha256: the train script is only run against a recorded sha256"
+EXPECTED=$(awk '{print $1; exit}' "$PIN_FILE" | tr 'A-F' 'a-f')
+[[ "$EXPECTED" =~ ^[0-9a-f]{64}$ ]] || die ".github/train.sha256 must start with a 64-character sha256"
+
+COMMON=$(cd "$ROOT" && cd "$(git rev-parse --git-common-dir)" && pwd)
+CACHE_DIR="$COMMON/train-cache/$TRAIN_TAG"
+CACHED="$CACHE_DIR/merge-train.sh"
+
+if [ -f "$CACHED" ] && [ "$(sha256_of "$CACHED")" = "$EXPECTED" ]; then
+  :
+else
+  mkdir -p "$CACHE_DIR"
+  TMP=$(mktemp "$CACHE_DIR/fetch.XXXXXX")
+  trap 'rm -f "$TMP"' EXIT
+  $GH api -H 'Accept: application/vnd.github.raw' \
+    "repos/$TRAIN_SOURCE_REPO/contents/$TRAIN_SOURCE_PATH?ref=$TRAIN_TAG" > "$TMP" \
+    || die "could not fetch $TRAIN_SOURCE_PATH at $TRAIN_TAG from $TRAIN_SOURCE_REPO (gh login? network?)"
+  [ -s "$TMP" ] || die "fetched an empty train script"
+  GOT=$(sha256_of "$TMP")
+  [ "$GOT" = "$EXPECTED" ] \
+    || die "sha256 mismatch for $TRAIN_SOURCE_PATH at $TRAIN_TAG: got $GOT, .github/train.sha256 says $EXPECTED. Not running it."
+  chmod +x "$TMP"
+  mv "$TMP" "$CACHED"
+  trap - EXIT
+fi
+
+exec bash "$CACHED" "$@"

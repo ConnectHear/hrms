@@ -1,6 +1,9 @@
 name: CI
 
 on:
+  # train/** is the shared merge train's test ref (.github/train.json, ci: github).
+  push:
+    branches: ['train/**']
   pull_request:
     paths-ignore:
       - "**.css"
@@ -26,7 +29,7 @@ jobs:
     timeout-minutes: 60
     env:
       NODE_ENV: "production"
-      WITH_COVERAGE: ${{ github.event_name != 'pull_request' }}
+      WITH_COVERAGE: ${{ github.event_name != 'pull_request' && github.event_name != 'push' }}
 
     strategy:
       fail-fast: false
@@ -115,11 +118,11 @@ jobs:
         run: cd ~/frappe-bench/ && bench --site test_site run-parallel-tests --app hrms --total-builds ${{ strategy.job-total }} --build-number ${{ matrix.container }}
         env:
           TYPE: server
-          CAPTURE_COVERAGE: ${{ github.event_name != 'pull_request' }}
+          CAPTURE_COVERAGE: ${{ github.event_name != 'pull_request' && github.event_name != 'push' }}
 
       - name: Upload coverage data
         uses: actions/upload-artifact@v4
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && github.event_name != 'push'
         with:
           name: coverage-${{ matrix.container }}
           path: /home/runner/frappe-bench/sites/coverage.xml
@@ -128,7 +131,7 @@ jobs:
     name: Coverage Wrap Up
     needs: tests
     runs-on: ubuntu-latest
-    if: ${{ github.event_name != 'pull_request' }}
+    if: ${{ github.event_name != 'pull_request' && github.event_name != 'push' }}
     steps:
       - name: Clone
         uses: actions/checkout@v4

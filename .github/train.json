@@ -1,0 +1,7 @@
+{
+  "integration_branch": "connecthear",
+  "ci": "github",
+  "deploy_on_merge": false,
+  "needs_go": true,
+  "skip_ci": false
+}
